@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
 import '../utilities/constants.dart';
 import '../services/weather.dart';
 import 'city_screen.dart';
@@ -14,10 +16,12 @@ class LocationScreen extends StatefulWidget {
 
 class _LocationScreenState extends State<LocationScreen> {
   WeatherModel weather = WeatherModel();
-  int temperature;
+  int temperature, humidity;
+  String windSpeed, temperatureMin, temperatureMax;
   String weatherIcon;
   String cityName;
   String weatherMessage;
+  String weatherDescription;
 
   @override
   void initState() {
@@ -30,13 +34,23 @@ class _LocationScreenState extends State<LocationScreen> {
     setState(() {
       if (weatherData == null) {
         temperature = 0;
+
+        humidity = 0;
+        windSpeed = '0';
         weatherIcon = 'Error';
         weatherMessage = 'Unable to get weather data';
+        weatherDescription = 'Unable to get weather data';
         cityName = '';
         return;
       }
       double temp = weatherData['main']['temp'];
+
+      humidity = weatherData['main']['humidity'];
+      windSpeed = ((weatherData['wind']['speed']) * 3.6).toStringAsFixed(2);
+      weatherDescription = weatherData['weather'][0]['description'];
+
       temperature = temp.toInt();
+
       var condition = weatherData['weather'][0]['id'];
       weatherIcon = weather.getWeatherIcon(condition);
       weatherMessage = weather.getMessage(temperature);
@@ -50,7 +64,7 @@ class _LocationScreenState extends State<LocationScreen> {
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('images/city1.png'),
+            image: AssetImage('images/city1.jpg'),
             fit: BoxFit.cover,
             colorFilter: ColorFilter.mode(
                 Colors.white.withOpacity(0.8), BlendMode.dstATop),
@@ -99,13 +113,46 @@ class _LocationScreenState extends State<LocationScreen> {
                 ],
               ),
               Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Column(
+                      children: <Widget>[
+                        Text(
+                          "Wind Speed",
+                          style: GoogleFonts.oswald(fontSize: 25),
+                        ),
+                        Text(
+                          '$windSpeed Km/h',
+                          style: GoogleFonts.oswald(fontSize: 25),
+                        ),
+                      ],
+                    ),
+                    Column(
+                      children: <Widget>[
+                        Text(
+                          "Humidity",
+                          style: GoogleFonts.oswald(fontSize: 25),
+                        ),
+                        Text(
+                          '$humidity %',
+                          style: GoogleFonts.oswald(fontSize: 25),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
                 padding: EdgeInsets.only(left: 15.0),
                 child: Row(
                   children: <Widget>[
                     Center(
                       child: Text(
                         '$temperature°',
-                        style: kTempTextStyle,
+                        style: GoogleFonts.oswald(
+                            fontWeight: FontWeight.bold, fontSize: 80),
                       ),
                     ),
                     Text(
@@ -115,12 +162,18 @@ class _LocationScreenState extends State<LocationScreen> {
                   ],
                 ),
               ),
+              Center(
+                  child: Text(
+                '$weatherDescription',
+                style: GoogleFonts.oswald(
+                    fontWeight: FontWeight.w500, fontSize: 30),
+              )),
               Padding(
                 padding: EdgeInsets.all(15.0),
                 child: Text(
                   '$weatherMessage in $cityName',
                   textAlign: TextAlign.center,
-                  style: kMessageTextStyle,
+                  style: GoogleFonts.oswald(fontWeight: FontWeight.bold,fontSize: 60),
                 ),
               ),
             ],
